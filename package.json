@@ -1,0 +1,30 @@
+{
+  "name": "devebot-co-mongoose",
+  "version": "0.0.1-alpha1",
+  "description": "Devebot -co- mongoose bridge",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devebot/devebot-co-mongoose.git"
+  },
+  "keywords": [
+    "devebot",
+    "devebot-bridge"
+  ],
+  "author": "devebot",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/devebot/devebot-co-mongoose/issues"
+  },
+  "homepage": "https://github.com/devebot/devebot-co-mongoose#readme",
+  "peerDependencies": {
+    "devebot": "^0.1.20"
+  },
+  "dependencies": {
+    "devebot": "^0.1.20",
+    "mongoose": "^4.4.12"
+  }
+}
