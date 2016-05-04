@@ -1,6 +1,6 @@
 {
   "name": "devebot-co-mongoose",
-  "version": "0.0.1-alpha1",
+  "version": "0.1.1",
   "description": "Devebot -co- mongoose bridge",
   "main": "index.js",
   "scripts": {
