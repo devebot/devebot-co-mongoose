@@ -1,6 +1,6 @@
 {
   "name": "devebot-co-mongoose",
-  "version": "0.1.1",
+  "version": "0.1.2-alpha.1",
   "description": "Devebot -co- mongoose bridge",
   "main": "index.js",
   "scripts": {
@@ -21,10 +21,10 @@
   },
   "homepage": "https://github.com/devebot/devebot-co-mongoose#readme",
   "peerDependencies": {
-    "devebot": "^0.1.20"
+    "devebot": "^0.1.21"
   },
   "dependencies": {
-    "devebot": "^0.1.20",
+    "devebot": "^0.1.21",
     "mongoose": "^4.4.12"
   }
 }
