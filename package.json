@@ -3,8 +3,21 @@
   "version": "0.2.0",
   "description": "Devebot -co- mongoose bridge",
   "main": "index.js",
+  "directories": {
+    "lib": "lib/"
+  },
+  "files": [
+    "bin/",
+    "data/",
+    "lib/"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 0"
+    "build": "babel ./src -d ./lib",
+    "clean": "rm -rf ./lib",
+    "prepublish": "npm run clean && NODE_ENV=${DEVEBOT_NODE_ENV:-production} npm run build",
+    "pretest": "npm run clean && NODE_ENV=${DEVEBOT_NODE_ENV:-test} npm run build",
+    "test": "mocha --recursive ./test/**/*-test.js",
+    "verify": "npm run prepublish && mocha --recursive ./test/**/*-test.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +35,12 @@
   "homepage": "https://github.com/devebot/devebot-co-mongoose#readme",
   "peerDependencies": {
     "devebot": "^0.2.6"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-minify-mangle-names": "^0.3.0",
+    "babel-preset-env": "^1.6.1",
+    "mocha": "^4.1.0"
   },
   "dependencies": {
     "devebot": "^0.2.6",
