@@ -7,14 +7,11 @@ var debugx = Devebot.require('pinbug')('devebot:co:mongoose:bridge');
 var mongoose = require('mongoose');
 var chores = require('./chores');
 
-var noop = function() {};
+mongoose.Promise = Promise;
 
 var Service = function(params) {
-  debugx(' + constructor start ...');
-  
   params = params || {};
-  
-  var self = this;
+
   var LX = this.logger || chores.getLogger();
   var LT = this.tracer || chores.getTracer();
 
@@ -22,26 +19,26 @@ var Service = function(params) {
   var mongo_connection_string = chores.buildMongodbUrl(mongo_conf);
   var connection = null;
 
-  self.getConnection = function() {
+  this.getConnection = function() {
     return (connection = connection || createConnection({ mongoURI: mongo_connection_string}));
   };
 
-  self.getSchema = function() {
+  this.getSchema = function() {
     return mongoose.Schema;
   };
 
-  self.isModelAvailable = function(modelName) {
-    return !lodash.isNull(self.retrieveModel(modelName));
+  this.isModelAvailable = function(modelName) {
+    return !lodash.isNull(this.retrieveModel(modelName));
   };
 
-  self.retrieveModel = function(modelName) {
-    if (self.getConnection().modelNames().indexOf(modelName) < 0) return null;
-    return self.getConnection().model(modelName);
+  this.retrieveModel = function(modelName) {
+    if (this.getConnection().modelNames().indexOf(modelName) < 0) return null;
+    return this.getConnection().model(modelName);
   };
 
-  self.registerModel = function(modelName, modelObject, modelOptions) {
-    if (self.getConnection().modelNames().indexOf(modelName) >= 0) {
-      return self.getConnection().model(modelName);
+  this.registerModel = function(modelName, modelObject, modelOptions) {
+    if (this.getConnection().modelNames().indexOf(modelName) >= 0) {
+      return this.getConnection().model(modelName);
     }
     var DocumentSchema = null;
     if (lodash.isFunction(modelObject)) {
@@ -50,21 +47,21 @@ var Service = function(params) {
     } else if (lodash.isObject(modelObject) && !lodash.isArray(modelObject)) {
       DocumentSchema = new mongoose.Schema(modelObject, modelOptions);
     }
-    return (DocumentSchema == null) ? null : self.getConnection().model(modelName, DocumentSchema);
+    return (DocumentSchema == null) ? null : this.getConnection().model(modelName, DocumentSchema);
   };
 
-  self.getServiceInfo = function() {
+  this.getServiceInfo = function() {
     var conf = lodash.pick(mongo_conf, ['host', 'port', 'name', 'username', 'password']);
     lodash.assign(conf, { password: '***' });
     return {
       connection_info: conf,
       url: chores.buildMongodbUrl(conf),
-      modelNames: self.getConnection().modelNames()
+      modelNames: this.getConnection().modelNames()
     };
   };
   
-  self.getServiceHelp = function() {
-    var info = self.getServiceInfo();
+  this.getServiceHelp = function() {
+    var info = this.getServiceInfo();
     return [{
       type: 'record',
       title: 'MongoDB bridge',
@@ -80,8 +77,6 @@ var Service = function(params) {
       }
     }];
   };
-
-  debugx(' - constructor has finished');
 };
 
 module.exports = Service;
