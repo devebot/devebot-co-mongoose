@@ -1,6 +1,6 @@
 {
   "name": "devebot-co-mongoose",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Devebot -co- mongoose bridge",
   "main": "index.js",
   "directories": {
@@ -34,7 +34,7 @@
   },
   "homepage": "https://github.com/devebot/devebot-co-mongoose#readme",
   "peerDependencies": {
-    "devebot": "^0.2.6"
+    "devebot": "^0.3.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -43,7 +43,7 @@
     "mocha": "^4.1.0"
   },
   "dependencies": {
-    "devebot": "^0.2.6",
-    "mongoose": "^5.4.23"
+    "devebot": "^0.3.0",
+    "mongoose": "5.4.23"
   }
 }
