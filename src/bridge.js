@@ -1,27 +1,44 @@
 'use strict';
 
-var Devebot = require('devebot');
-var Promise = Devebot.require('bluebird');
-var lodash = Devebot.require('lodash');
-var debugx = Devebot.require('pinbug')('devebot:co:mongoose:bridge');
-var mongoose = require('mongoose');
-var chores = require('./chores');
+const Devebot = require('devebot');
+const Promise = Devebot.require('bluebird');
+const lodash = Devebot.require('lodash');
+const mongoose = require('mongoose');
+const chores = require('./chores');
 
 mongoose.Promise = Promise;
 
-var Service = function(params) {
+function Service(params) {
   params = params || {};
 
-  var LX = this.logger || chores.getLogger();
-  var LT = this.tracer || chores.getTracer();
-
-  var mongo_conf = params.connection_options || {};
-  var mongo_connection_string = chores.buildMongodbUrl(mongo_conf);
-  var connection = null;
+  let mongo_conf = params.connection_options || params;
+  let connection_string = params.connection_string || params.url;
+  if (!lodash.isString(connection_string) || lodash.isEmpty(connection_string)) {
+    connection_string = chores.buildMongodbUrl(mongo_conf);
+  }
+  let connection = null;
 
   this.getConnection = function() {
-    return (connection = connection || createConnection({ mongoURI: mongo_connection_string}));
+    return (connection = connection || createConnection(this, { mongoURI: connection_string }));
   };
+
+  this.disconnect = function() {
+    let p = new Promise(function(resolved, rejected) {
+      if (connection != null) {
+        connection.close(function() {
+          resolved();
+        })
+      } else {
+        resolved();
+      }
+    });
+    p = p.then(function() {
+      return mongoose.disconnect();
+    }, function() {
+      return mongoose.disconnect();
+    });
+    return p;
+  }
 
   this.getSchema = function() {
     return mongoose.Schema;
@@ -51,7 +68,7 @@ var Service = function(params) {
   };
 
   this.getServiceInfo = function() {
-    var conf = lodash.pick(mongo_conf, ['host', 'port', 'name', 'username', 'password']);
+    let conf = lodash.pick(mongo_conf, ['host', 'port', 'name', 'username', 'password']);
     lodash.assign(conf, { password: '***' });
     return {
       connection_info: conf,
@@ -61,7 +78,7 @@ var Service = function(params) {
   };
   
   this.getServiceHelp = function() {
-    var info = this.getServiceInfo();
+    let info = this.getServiceInfo();
     return [{
       type: 'record',
       title: 'MongoDB bridge',
@@ -81,8 +98,11 @@ var Service = function(params) {
 
 module.exports = Service;
 
-var createConnection = function(params) {
+function createConnection(self, params) {
   params = params || {};
+
+  const LX = self.logger || chores.getLogger();
+  const LT = self.tracer || chores.getTracer();
 
   var mongoURI = params.mongoURI;
   if (lodash.isEmpty(mongoURI)) return null;
@@ -91,24 +111,23 @@ var createConnection = function(params) {
 
   // When successfully connected
   connection.on('connected', function() {
-    debugx('Mongoose connected to [' + mongoURI + ']');
+    LX.has('debug') && LX.log('debug', 'Mongoose connected to [' + mongoURI + ']');
   });
 
   // When the connection is disconnected
   connection.on('disconnected', function() {
-    debugx('Mongoose disconnected from [' + mongoURI + ']');
+    LX.has('debug') && LX.log('debug', 'Mongoose disconnected from [' + mongoURI + ']');
   });
 
   // If the connection throws an error
   connection.on('error', function(err) {
-    debugx('Mongoose connection[' + mongoURI + '] error:' + err);
+    LX.has('debug') && LX.log('debug', 'Mongoose connection[' + mongoURI + '] error:' + err);
   });
 
   // If the Node process ends, close the Mongoose connection
   process.on('SIGINT', function() {
     connection.close(function () {
-      debugx('Mongoose connection[' + mongoURI + '] closed & app exit');
-      process.exit(0);
+      LX.has('debug') && LX.log('debug', 'Mongoose connection[' + mongoURI + '] closed');
     });
   });
 
