@@ -8,9 +8,7 @@ const chores = require('./chores');
 
 mongoose.Promise = Promise;
 
-function Service(params) {
-  params = params || {};
-
+function Service(params = {}) {
   let mongo_conf = params.connection_options || params;
   let connection_string = params.connection_string || params.url;
   if (!lodash.isString(connection_string) || lodash.isEmpty(connection_string)) {
@@ -32,9 +30,7 @@ function Service(params) {
         resolved();
       }
     });
-    p = p.then(function() {
-      return mongoose.disconnect();
-    }, function() {
+    p = p.finally(function() {
       return mongoose.disconnect();
     });
     return p;
@@ -98,9 +94,7 @@ function Service(params) {
 
 module.exports = Service;
 
-function createConnection(self, params) {
-  params = params || {};
-
+function createConnection(self = {}, params = {}) {
   const LX = self.logger || chores.getLogger();
   const LT = self.tracer || chores.getTracer();
 
