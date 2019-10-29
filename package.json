@@ -44,6 +44,6 @@
   },
   "dependencies": {
     "devebot": "^0.3.0",
-    "mongoose": "5.4.23"
+    "mongoose": "5.7.7"
   }
 }
